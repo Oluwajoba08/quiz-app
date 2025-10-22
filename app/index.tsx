@@ -12,7 +12,7 @@ export default function Index() {
       <ThemedText>Choose a category to start:</ThemedText>
       {CATEGORIES.map((category) => (
         <ThemedView key={category} style={styles.categoryWrapper}>
-          <Link href={`/quiz`} style={styles.category} asChild>  
+          <Link href={"/quiz/0"} style={styles.category} asChild>  
             <ThemedText>{category}</ThemedText>
           </Link>
         </ThemedView>
