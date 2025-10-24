@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from './themed-text';
 // import useStore from '@/stores/useStore';
 
@@ -14,7 +14,10 @@ type NavigationProps = {
 const NavigationButtons = ({ currentQuestionIndex, totalQuestions, isNextDisabled, onNext, onPrevious }: NavigationProps) => {
 
   const handleNext = () => {
-    if (isNextDisabled) return;
+    if (isNextDisabled) {
+      Alert.alert('No Answer Selected','Please select an answer before proceeding.');
+      return;
+    }
     onNext();
   };
 
@@ -29,10 +32,9 @@ const NavigationButtons = ({ currentQuestionIndex, totalQuestions, isNextDisable
       </Pressable>
       <Pressable 
         style={[styles.button, currentQuestionIndex === totalQuestions - 1 && styles.disabled]} 
-        onPress={handleNext} 
-        disabled={currentQuestionIndex === totalQuestions - 1}
+        onPress={handleNext}
       >
-        <ThemedText>Next</ThemedText>
+        <ThemedText>{currentQuestionIndex === totalQuestions - 1 ? 'See results' :'Next'}</ThemedText>
       </Pressable>
     </View>
   );

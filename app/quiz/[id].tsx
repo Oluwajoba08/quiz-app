@@ -1,7 +1,6 @@
 import NavigationButtons from '@/components/NavigationButtons';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import Timer from '@/components/Timer';
 import useStore from '@/stores/useStore';
 import { questions } from '@/utils/data';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -18,12 +17,14 @@ export default function QuestionScreen() {
     router.replace('/'); // example
     return null;    
   }
-  const { incrementScore, addUserAnswer } = useStore((state) => ({
-    incrementScore: state.incrementScore,
-    addUserAnswer: state.addUserAnswer,
-  }));
-  const [timeLeft, setTimeLeft] = useState(30); // 30 seconds for each question
+  const incrementScore = useStore((state) => state.incrementScore);
+  const addUserAnswer = useStore((state) => state.addUserAnswer);
+
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSelectedOption(null);
+  }, [questionIndex]);
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
@@ -33,13 +34,10 @@ export default function QuestionScreen() {
     const answer = selectedOption ?? 'UNANSWERED';
     addUserAnswer(answer);
 
-    // check correctness and increment score if needed
-    // questions data uses `answer` as the correct answer string
     if (selectedOption && question?.answer && selectedOption === question.answer) {
       incrementScore();
     }
 
-    // navigate to next question or results screen
     const nextIndex = questionIndex + 1;
     if (nextIndex < questions.length) {
       router.push(`/quiz/${nextIndex}`);
@@ -53,25 +51,11 @@ export default function QuestionScreen() {
   };
 
   const question = questions[questionIndex];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleNextQuestion();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    setTimeLeft(30); // reset when question changes
-  }, [questionIndex]);
+   // guard for out-of-range index
+  if (!question) {
+    router.replace('/');
+    return null;
+  }
 
   return (
     <ThemedView style={styles.container}>
@@ -88,7 +72,6 @@ export default function QuestionScreen() {
           <ThemedText>{option}</ThemedText>
         </Pressable>
       ))}
-      <Timer duration={timeLeft} onTimeUp={handleNextQuestion} />
       <NavigationButtons
         currentQuestionIndex={questionIndex}
         totalQuestions={questions.length}
@@ -113,6 +96,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   selectedOption: {
-    backgroundColor: '#d3f9d8',
+    borderColor: '#275ccfff',
+    borderWidth: 2,
   },
 });

@@ -1,20 +1,29 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import { ScrollView, StyleSheet } from 'react-native';
+import useStore from '@/stores/useStore';
+import { useRouter } from 'expo-router';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
-const CATEGORIES = ["Tech Trivia"];
+const CATEGORIES = ["Tech Quiz"];
 
 export default function Index() {
+  const router = useRouter();
+  const startQuiz = useStore((s) => s.resetQuiz);
+
+  const onStart = () => {
+    startQuiz();
+    router.push('/quiz/0');
+  };
+
   return (
-    <ScrollView style={styles.container}> 
-      <ThemedText type='subtitle'>Welcome to the Tech Trivia Quiz!</ThemedText>
+    <ScrollView style={styles.container}>
+      <ThemedText type='subtitle'>Welcome to the Tech Quiz!</ThemedText>
       <ThemedText>Choose a category to start:</ThemedText>
       {CATEGORIES.map((category) => (
         <ThemedView key={category} style={styles.categoryWrapper}>
-          <Link href={"/quiz/0"} style={styles.category} asChild>  
+          <TouchableOpacity style={styles.category} onPress={onStart}>
             <ThemedText>{category}</ThemedText>
-          </Link>
+          </TouchableOpacity>
         </ThemedView>
       ))}
     </ScrollView>
@@ -31,7 +40,6 @@ const styles = StyleSheet.create({
   },
   category: {
     borderRadius: 10,
-    backgroundColor: '#f0f0f0ff',
     padding: 15,
     alignItems: 'center',
   },
